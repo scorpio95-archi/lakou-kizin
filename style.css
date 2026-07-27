@@ -4,20 +4,25 @@
    ============================================================ */
 
 :root{
-  --creme: #fbf3e7;
-  --creme-carte: #ffffff;
+  --creme: #f2e2ce;
+  --creme-carte: #fffaf3;
   --paprika: #c1481d;
   --paprika-fonce: #93340f;
+  --bordeaux: #6e1423;
+  --bordeaux-fonce: #4a0d18;
   --basilic: #3c5a3e;
   --basilic-clair: #6d8f6a;
-  --charbon: #2a211a;
+  --charbon: #241713;
   --or: #d99a3f;
-  --ombre: 0 8px 24px rgba(42,33,26,0.10);
+  --ombre: 0 8px 24px rgba(42,33,26,0.14);
 }
 
 *{box-sizing:border-box; margin:0; padding:0;}
 body{
-  background: var(--creme);
+  background:
+    radial-gradient(ellipse 900px 500px at 15% 0%, rgba(110,20,35,0.10), transparent 60%),
+    radial-gradient(ellipse 700px 500px at 100% 30%, rgba(193,72,29,0.10), transparent 55%),
+    var(--creme);
   color: var(--charbon);
   font-family: 'Karla', sans-serif;
   line-height:1.5;
@@ -31,20 +36,26 @@ img{ max-width:100%; display:block; }
 header{
   position:sticky; top:0; z-index:50;
   display:flex; align-items:center; justify-content:space-between;
-  padding:14px 18px;
-  background: rgba(251,243,231,0.92);
+  padding:12px 18px;
+  background: rgba(242,226,206,0.94);
   backdrop-filter: blur(8px);
-  border-bottom:1px solid rgba(42,33,26,0.08);
+  border-bottom:2px solid var(--bordeaux);
 }
 .logo-link{ display:flex; align-items:center; gap:8px; }
 .logo-text{ font-weight:600; font-size:1.05rem; color:var(--charbon); }
 .logo-text span{ color:var(--paprika); font-weight:500; }
-.retour-lien{
-  display:inline-flex; align-items:center; gap:6px;
-  margin:14px 18px 0; font-size:0.9rem; color:var(--basilic);
-  font-weight:600;
+
+/* Fil d'Ariane persistant vers le hub — toujours visible, pas dans le menu */
+.fil-ariane{
+  display:flex; align-items:center; gap:6px;
+  padding:9px 18px;
+  background: var(--bordeaux);
+  color:#fff8ec;
+  font-size:0.82rem; font-weight:600;
 }
-.retour-lien svg{ width:18px; height:18px; }
+.fil-ariane svg{ width:15px; height:15px; flex-shrink:0; }
+.fil-ariane a{ color:#fff8ec; opacity:0.95; }
+.fil-ariane a:hover{ text-decoration:underline; }
 
 .burger{ width:34px; height:34px; position:relative; background:none; border:none; }
 .burger span{
@@ -68,15 +79,40 @@ header{
   background:var(--creme-carte); z-index:70; padding:24px 18px;
   transition:right .3s ease; overflow-y:auto;
   box-shadow:-8px 0 30px rgba(0,0,0,0.15);
+  border-left:3px solid var(--bordeaux);
 }
 .menu-panel.open{ right:0; }
 .menu-section{
   font-size:0.75rem; text-transform:uppercase; letter-spacing:.06em;
-  color:var(--basilic-clair); font-weight:700; margin:18px 0 8px;
+  color:var(--bordeaux); font-weight:700; margin:18px 0 8px;
 }
 .menu-panel a{
   display:block; padding:10px 4px; font-weight:600; color:var(--charbon);
   border-bottom:1px solid rgba(42,33,26,0.06);
+}
+.menu-panel a small{
+  display:block; font-weight:400; font-size:0.78rem; color:#8a7264; margin-top:2px;
+}
+/* Accordéon "Ateliers" */
+.menu-accordion-toggle{
+  width:100%; display:flex; align-items:center; justify-content:space-between;
+  padding:10px 4px; background:none; border:none; text-align:left;
+  font-family:'Karla', sans-serif; font-weight:600; font-size:1rem; color:var(--charbon);
+  border-bottom:1px solid rgba(42,33,26,0.06); cursor:pointer;
+}
+.menu-accordion-toggle small{
+  display:block; font-weight:400; font-size:0.78rem; color:#8a7264; margin-top:2px;
+}
+.menu-accordion-toggle .chevron{ width:18px; height:18px; flex-shrink:0; transition:transform .25s; color:var(--bordeaux); }
+.menu-accordion-toggle.open .chevron{ transform:rotate(180deg); }
+.menu-submenu{
+  max-height:0; overflow:hidden; transition:max-height .25s ease;
+  background:rgba(110,20,35,0.04);
+}
+.menu-submenu.open{ max-height:260px; }
+.menu-submenu a{
+  padding:9px 4px 9px 16px; font-weight:500; font-size:0.92rem;
+  border-bottom:1px solid rgba(42,33,26,0.05);
 }
 
 /* ---------- BANNIÈRE ---------- */
@@ -142,7 +178,15 @@ header{
 }
 .atelier-card .ac-meta svg{ width:15px; height:15px; }
 
-/* ---------- VOS CRÉATIONS ---------- */
+/* ---------- VOS CRÉATIONS (bandeau bordeaux) ---------- */
+.creations-bandeau{
+  background: linear-gradient(160deg, var(--bordeaux) 0%, var(--bordeaux-fonce) 100%);
+  padding:1px 0 28px; margin-top:44px;
+}
+.creations-bandeau .section-label span{ color:#fff8ec; }
+.creations-bandeau .section-label .line{ background:rgba(255,248,236,0.25); }
+.creations-bandeau .section-intro{ color:rgba(255,248,236,0.8); }
+
 .creations-scroll{
   display:flex; gap:14px; overflow-x:auto; padding:4px 18px 12px;
   scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;
@@ -162,11 +206,13 @@ header{
 .creation-card .cc-stats span{ display:flex; align-items:center; gap:3px; }
 .creation-card .cc-stats svg{ width:13px; height:13px; }
 .creations-empty{
-  margin:0 18px; padding:22px; text-align:center; color:#8a7a68;
-  background:var(--creme-carte); border-radius:14px; font-size:0.9rem;
+  margin:0 18px; padding:22px; text-align:center; color:rgba(255,248,236,0.75);
+  background:rgba(255,248,236,0.08); border:1px dashed rgba(255,248,236,0.25);
+  border-radius:14px; font-size:0.9rem;
 }
 
 footer{
-  margin-top:48px; padding:26px 20px 40px; text-align:center;
-  color:#8a7a68; font-size:0.82rem; border-top:1px solid rgba(42,33,26,0.08);
+  padding:26px 20px 40px; text-align:center;
+  color:#f0d9c2; font-size:0.82rem;
+  background:var(--charbon);
 }
