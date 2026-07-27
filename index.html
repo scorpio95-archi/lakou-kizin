@@ -50,6 +50,7 @@
   </div>
 
   <a href="#creations" data-close>Vos créations<small>Les petits succès des étudiants</small></a>
+  <a href="parametres.html" id="menuParametres" data-close style="display:none;">Mon profil<small>Avatar, informations, mot de passe</small></a>
 
   <div class="menu-section">Réseau</div>
   <a href="https://lakou-inivesite.vercel.app/">← Retour à Lakou Inivesite</a>
@@ -121,8 +122,10 @@
   (async () => {
     const session = await sessionActuelle();
     const lienDeco = document.getElementById('menuDeconnexion');
+    const lienParams = document.getElementById('menuParametres');
     if (session) {
       lienDeco.style.display = 'block';
+      lienParams.style.display = 'block';
       lienDeco.addEventListener('click', (e) => { e.preventDefault(); deconnecter(); });
     }
   })();
