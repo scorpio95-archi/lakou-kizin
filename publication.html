@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Publication — Lakou Kizin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo-link">
+    <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+      <circle cx="20" cy="20" r="18" fill="#c1481d"/>
+      <path d="M13 15v10M13 15c0 2 2 2 2 0v-3M17 15v10M17 12c-2 0-3 1.5-3 4M27 12c-4 0-6 3-6 7 0 2 1.5 3 3 3s3-1 3-3" stroke="#fbf3e7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="logo-text">LAKOU<span>Kizin</span></span>
+  </a>
+  <span id="authStatus" style="font-weight:700; font-size:0.9rem;"></span>
+</header>
+
+<div class="fil-ariane">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+  <a href="index.html">Lakou Kizin</a>
+  <span style="opacity:.6;">/</span>
+  <a href="#" id="filArianeAtelier">Atelier</a>
+</div>
+
+<main>
+  <div class="carousel">
+    <div class="carousel-track" id="carouselTrack"></div>
+    <div class="carousel-dots" id="carouselDots"></div>
+  </div>
+
+  <div class="pub-detail-body">
+    <h1 id="pubTitre">Chargement…</h1>
+    <div class="pub-detail-meta">
+      <span id="pubAuteur"></span> <span>·</span> <span id="pubDate"></span>
+    </div>
+    <p class="pub-detail-desc" id="pubDesc"></p>
+  </div>
+
+  <div class="actions-row">
+    <button class="btn-like" id="btnLike">
+      <svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-10-9.3C.4 8 2 4.5 5.5 4.5c2 0 3.5 1.2 4.5 2.7 1-1.5 2.5-2.7 4.5-2.7C18 4.5 19.6 8 22 11.7 19.5 16.4 12 21 12 21z"/></svg>
+      <span id="likeCount">0</span>
+    </button>
+    <span class="vues-compteur">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+      <span id="vuesCount">0</span> vues
+    </span>
+  </div>
+
+  <div class="comments-section">
+    <h2>Commentaires</h2>
+    <div id="commentsList"></div>
+
+    <div id="commentZone"></div>
+  </div>
+</main>
+
+<script src="client-supabase.js"></script>
+<script src="auth.js"></script>
+<script src="publication.js"></script>
+
+</body>
+</html>
