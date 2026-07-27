@@ -23,12 +23,31 @@
   </button>
 </header>
 
+<div class="fil-ariane">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+  <a href="https://lakou-inivesite.vercel.app/">Lakou Inivesite</a>
+  <span style="opacity:.6;">/</span>
+  <span>Lakou Kizin</span>
+</div>
+
 <div class="overlay" id="overlay"></div>
 <nav class="menu-panel" id="menuPanel">
   <div class="menu-section">Navigation</div>
   <a href="index.html" data-close>Accueil<small>Retour en haut de page</small></a>
-  <a href="#ateliers" data-close>Ateliers<small>Pâtisserie, boulangerie, cuisine locale…</small></a>
-  <a href="#creations" data-close>Vos créations<small>Les succès des étudiants</small></a>
+
+  <button class="menu-accordion-toggle" id="ateliersToggle">
+    <span>Ateliers<small>Pâtisserie, boulangerie, cuisine locale…</small></span>
+    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
+  <div class="menu-submenu" id="ateliersSubmenu">
+    <a href="atelier.html?slug=patisserie" data-close>Pâtisserie</a>
+    <a href="atelier.html?slug=boulangerie" data-close>Boulangerie</a>
+    <a href="atelier.html?slug=cuisine-locale" data-close>Cuisine locale</a>
+    <a href="atelier.html?slug=art-de-la-table" data-close>Art de la table</a>
+  </div>
+
+  <a href="#creations" data-close>Vos créations<small>Les petits succès des étudiants</small></a>
+
   <div class="menu-section">Réseau</div>
   <a href="https://lakou-inivesite.vercel.app/">← Retour à Lakou Inivesite</a>
 </nav>
@@ -52,11 +71,13 @@
     <!-- injecté par app-kizin.js -->
   </section>
 
-  <div class="section-label" id="creations"><span>Vos créations</span><div class="line"></div></div>
-  <p class="section-intro">Les petits succès partagés par la communauté — likez, commentez, encouragez.</p>
+  <div class="creations-bandeau" id="creations">
+    <div class="section-label"><span>Vos créations</span><div class="line"></div></div>
+    <p class="section-intro">Les petits succès partagés par la communauté — likez, commentez, encouragez.</p>
 
-  <div class="creations-scroll" id="creationsScroll">
-    <!-- injecté par app-kizin.js -->
+    <div class="creations-scroll" id="creationsScroll">
+      <!-- injecté par app.js -->
+    </div>
   </div>
 
   <footer>
@@ -84,6 +105,13 @@
   });
   overlay.addEventListener('click', closeMenu);
   menuPanel.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', closeMenu));
+
+  const ateliersToggle = document.getElementById('ateliersToggle');
+  const ateliersSubmenu = document.getElementById('ateliersSubmenu');
+  ateliersToggle.addEventListener('click', () => {
+    ateliersToggle.classList.toggle('open');
+    ateliersSubmenu.classList.toggle('open');
+  });
 </script>
 
 </body>
