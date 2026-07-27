@@ -78,6 +78,7 @@ header{
   display:block; padding:10px 4px; font-weight:600; color:var(--charbon);
   border-bottom:1px solid rgba(42,33,26,0.06);
 }
+
 /* ---------- BANNIÈRE ---------- */
 .banniere{
   position:relative; min-height:280px;
@@ -140,6 +141,7 @@ header{
   display:flex; align-items:center; gap:6px; font-size:0.82rem; color:var(--basilic); font-weight:600;
 }
 .atelier-card .ac-meta svg{ width:15px; height:15px; }
+
 /* ---------- VOS CRÉATIONS ---------- */
 .creations-scroll{
   display:flex; gap:14px; overflow-x:auto; padding:4px 18px 12px;
