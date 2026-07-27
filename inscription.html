@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inscription — Lakou Kizin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  .auth-wrap{ max-width:420px; margin:0 auto; padding:32px 20px 60px; }
+  .auth-wrap h1{ font-size:1.6rem; margin-bottom:6px; }
+  .auth-wrap .sub{ color:#6b5d4e; font-size:0.92rem; margin-bottom:24px; }
+  .champ{ margin-bottom:16px; }
+  .champ label{ display:block; font-size:0.85rem; font-weight:700; margin-bottom:6px; color:var(--charbon); }
+  .champ input, .champ select{
+    width:100%; padding:12px 14px; border-radius:10px; border:1.5px solid rgba(42,23,19,0.15);
+    background:var(--creme-carte); font-size:1rem; font-family:'Karla', sans-serif; color:var(--charbon);
+  }
+  .champ input:focus, .champ select:focus{ outline:none; border-color:var(--bordeaux); }
+  .btn-principal{
+    width:100%; padding:14px; border:none; border-radius:12px; margin-top:6px;
+    background:var(--bordeaux); color:#fff8ec; font-weight:700; font-size:1rem;
+    font-family:'Karla', sans-serif; cursor:pointer;
+  }
+  .btn-principal:disabled{ opacity:0.6; }
+  .lien-bas{ text-align:center; margin-top:18px; font-size:0.9rem; color:#6b5d4e; }
+  .lien-bas a{ color:var(--bordeaux); font-weight:700; }
+  .message{ margin-top:14px; padding:12px 14px; border-radius:10px; font-size:0.88rem; display:none; }
+  .message.erreur{ background:#fbe3df; color:#8a2c1c; display:block; }
+  .message.succes{ background:#e2ede1; color:#2c4a2e; display:block; }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo-link">
+    <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+      <circle cx="20" cy="20" r="18" fill="#c1481d"/>
+      <path d="M13 15v10M13 15c0 2 2 2 2 0v-3M17 15v10M17 12c-2 0-3 1.5-3 4M27 12c-4 0-6 3-6 7 0 2 1.5 3 3 3s3-1 3-3" stroke="#fbf3e7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="logo-text">LAKOU<span>Kizin</span></span>
+  </a>
+  <span id="authStatus" style="font-weight:700; font-size:0.9rem;"></span>
+</header>
+
+<div class="fil-ariane">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+  <a href="index.html">Lakou Kizin</a>
+  <span style="opacity:.6;">/</span>
+  <span>Inscription</span>
+</div>
+
+<main class="auth-wrap">
+  <h1>Rejoindre Lakou Kizin</h1>
+  <p class="sub">Crée ton compte pour partager tes ateliers et tes créations.</p>
+
+  <form id="formInscription">
+    <div class="champ">
+      <label for="fullName">Nom complet</label>
+      <input type="text" id="fullName" required autocomplete="name">
+    </div>
+    <div class="champ">
+      <label for="role">Je suis</label>
+      <select id="role" required>
+        <option value="etudiant">Étudiant</option>
+        <option value="enseignant">Enseignant</option>
+        <option value="visiteur">Visiteur</option>
+      </select>
+    </div>
+    <div class="champ">
+      <label for="email">Adresse e-mail</label>
+      <input type="email" id="email" required autocomplete="email">
+    </div>
+    <div class="champ">
+      <label for="password">Mot de passe</label>
+      <input type="password" id="password" required minlength="6" autocomplete="new-password">
+    </div>
+    <button class="btn-principal" type="submit" id="btnSubmit">Créer mon compte</button>
+    <div class="message" id="message"></div>
+  </form>
+
+  <p class="lien-bas">Déjà un compte ? <a href="connexion.html">Se connecter</a></p>
+</main>
+
+<script src="client-supabase.js"></script>
+<script src="auth.js"></script>
+<script>
+  const form = document.getElementById('formInscription');
+  const btn = document.getElementById('btnSubmit');
+  const msg = document.getElementById('message');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    btn.disabled = true;
+    btn.textContent = 'Création en cours…';
+    msg.className = 'message';
+
+    const { error } = await inscrire({
+      email: document.getElementById('email').value.trim(),
+      password: document.getElementById('password').value,
+      fullName: document.getElementById('fullName').value.trim(),
+      role: document.getElementById('role').value
+    });
+
+    if (error) {
+      msg.textContent = error.message.includes('already registered')
+        ? 'Cette adresse e-mail est déjà utilisée.'
+        : 'Erreur : ' + error.message;
+      msg.className = 'message erreur';
+      btn.disabled = false;
+      btn.textContent = 'Créer mon compte';
+    } else {
+      msg.textContent = 'Compte créé ! Vérifie ta boîte mail pour confirmer, puis connecte-toi.';
+      msg.className = 'message succes';
+      form.reset();
+      btn.textContent = 'Compte créé';
+    }
+  });
+</script>
+
+</body>
+</html>
