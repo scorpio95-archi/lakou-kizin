@@ -23,11 +23,14 @@
   </button>
 </header>
 
-<div class="fil-ariane">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
-  <a href="https://lakou-inivesite.vercel.app/">Lakou Inivesite</a>
-  <span style="opacity:.6;">/</span>
-  <span>Lakou Kizin</span>
+<div class="fil-ariane" style="justify-content:space-between;">
+  <span style="display:flex; align-items:center; gap:6px;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+    <a href="https://lakou-inivesite.vercel.app/">Lakou Inivesite</a>
+    <span style="opacity:.6;">/</span>
+    <span>Lakou Kizin</span>
+  </span>
+  <span id="authStatus" style="font-weight:700;"></span>
 </div>
 
 <div class="overlay" id="overlay"></div>
@@ -50,6 +53,7 @@
 
   <div class="menu-section">Réseau</div>
   <a href="https://lakou-inivesite.vercel.app/">← Retour à Lakou Inivesite</a>
+  <a href="#" id="menuDeconnexion" style="display:none; color:var(--bordeaux);">Se déconnecter</a>
 </nav>
 
 <main id="top">
@@ -88,6 +92,7 @@
 </main>
 
 <script src="client-supabase.js"></script>
+<script src="auth.js"></script>
 <script src="app.js"></script>
 <script>
   const burgerBtn = document.getElementById('burgerBtn');
@@ -112,6 +117,15 @@
     ateliersToggle.classList.toggle('open');
     ateliersSubmenu.classList.toggle('open');
   });
+
+  (async () => {
+    const session = await sessionActuelle();
+    const lienDeco = document.getElementById('menuDeconnexion');
+    if (session) {
+      lienDeco.style.display = 'block';
+      lienDeco.addEventListener('click', (e) => { e.preventDefault(); deconnecter(); });
+    }
+  })();
 </script>
 
 </body>
