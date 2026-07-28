@@ -21,7 +21,7 @@ function ateliersCardHTML(atelier, count){
   return `
   <a class="atelier-card" href="atelier.html?slug=${atelier.slug}">
     <div class="ac-image">
-      <img src="" alt="${atelier.nom}" onerror="this.style.display='none'">
+      <img id="img-${atelier.slug}" src="" alt="${atelier.nom}" onerror="this.style.display='none'">
     </div>
     <div class="ac-body">
       <h3>${atelier.nom}</h3>
@@ -51,15 +51,21 @@ async function chargerAteliers(){
   const supabase = await window.lakouKizinReady;
 
   // Récupère les vrais IDs d'ateliers puis les compteurs réels (connecté à Supabase)
-  const { data: ateliersData } = await supabase.from('ateliers').select('id, slug');
+  const { data: ateliersData } = await supabase.from('ateliers').select('id, slug, image_url');
   if (!ateliersData) return;
   for (const a of ateliersData) {
     const { count } = await supabase
       .from('publications')
       .select('id', { count: 'exact', head: true })
       .eq('atelier_id', a.id);
-    const el = document.querySelector(`[data-count="${a.slug}"]`);
-    if (el) el.textContent = count ?? 0;
+    const compteurEl = document.querySelector(`[data-count="${a.slug}"]`);
+    if (compteurEl) compteurEl.textContent = count ?? 0;
+
+    const imgEl = document.getElementById(`img-${a.slug}`);
+    if (imgEl && a.image_url) {
+      imgEl.src = a.image_url;
+      imgEl.style.display = '';
+    }
   }
 }
 
