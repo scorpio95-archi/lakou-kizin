@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Uploader — Lakou Kizin (admin)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  .form-wrap{ max-width:480px; margin:0 auto; padding:24px 18px 60px; }
+  .form-wrap h1{ font-size:1.4rem; margin-bottom:6px; }
+  .form-wrap .sub{ color:#6b5d4e; font-size:0.9rem; margin-bottom:22px; }
+  .zone-upload{
+    border:2px dashed rgba(110,20,35,0.3); border-radius:14px; padding:24px 16px;
+    text-align:center; cursor:pointer; background:rgba(110,20,35,0.03); margin-bottom:16px;
+  }
+  input[type="file"]{ display:none; }
+  .liste-resultats{ display:flex; flex-direction:column; gap:12px; margin-top:16px; }
+  .resultat{
+    background:var(--creme-carte); border-radius:12px; padding:12px; display:flex; gap:12px; align-items:center;
+    box-shadow:var(--ombre);
+  }
+  .resultat img{ width:56px; height:56px; object-fit:cover; border-radius:8px; flex-shrink:0; }
+  .resultat-info{ flex:1; min-width:0; }
+  .resultat-nom{ font-size:0.85rem; font-weight:700; margin-bottom:4px; }
+  .resultat-url{
+    font-size:0.76rem; color:#6b5d4e; word-break:break-all; background:var(--creme);
+    padding:6px 8px; border-radius:6px; display:block;
+  }
+  .btn-copier{
+    margin-top:6px; padding:5px 10px; border-radius:16px; border:1.5px solid var(--bordeaux);
+    background:none; color:var(--bordeaux); font-size:0.75rem; font-weight:700; cursor:pointer;
+  }
+  .message{ margin-top:14px; padding:12px 14px; border-radius:10px; font-size:0.88rem; display:none; }
+  .message.erreur{ background:#fbe3df; color:#8a2c1c; display:block; }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo-link">
+    <span class="logo-text">LAKOU<span>Kizin</span></span>
+  </a>
+  <span id="authStatus" style="font-weight:700; font-size:0.9rem;"></span>
+</header>
+
+<main class="form-wrap">
+  <div id="blocRefuse" style="display:none;" class="connexion-requise">
+    Accès réservé aux comptes admin. <a href="connexion.html">Se connecter</a>
+  </div>
+
+  <div id="contenuUploader" style="display:none;">
+    <h1>Uploader des visuels du site</h1>
+    <p class="sub">Bannière, images d'ateliers — envoyées directement dans <code>lakou-kizin-media/site/</code>, sans passer par le dashboard Supabase.</p>
+
+    <div class="zone-upload" id="zoneUpload">Touche pour choisir une ou plusieurs images</div>
+    <input type="file" id="fichierInput" accept="image/*" multiple>
+
+    <div class="message" id="message"></div>
+    <div class="liste-resultats" id="resultats"></div>
+  </div>
+</main>
+
+<script src="client-supabase.js"></script>
+<script src="auth.js"></script>
+<script>
+  const BUCKET = 'lakou-kizin-media';
+
+  async function init(){
+    const session = await sessionActuelle();
+    if (!session || session.profile?.role !== 'admin') {
+      document.getElementById('blocRefuse').style.display = 'block';
+      return;
+    }
+    document.getElementById('contenuUploader').style.display = 'block';
+
+    const zone = document.getElementById('zoneUpload');
+    const input = document.getElementById('fichierInput');
+    const msg = document.getElementById('message');
+    const resultats = document.getElementById('resultats');
+
+    zone.addEventListener('click', () => input.click());
+
+    input.addEventListener('change', async (e) => {
+      const supabase = await window.lakouKizinReady;
+      msg.className = 'message';
+
+      for (const file of Array.from(e.target.files)) {
+        const chemin = `site/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.\-_]/g, '')}`;
+        const { error } = await supabase.storage.from(BUCKET).upload(chemin, file, {
+          contentType: file.type, upsert: true
+        });
+
+        if (error) {
+          msg.textContent = `Échec pour "${file.name}" : ${error.message}`;
+          msg.className = 'message erreur';
+          continue;
+        }
+
+        const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(chemin);
+        const bloc = document.createElement('div');
+        bloc.className = 'resultat';
+        bloc.innerHTML = `
+          <img src="${urlData.publicUrl}">
+          <div class="resultat-info">
+            <div class="resultat-nom">${file.name}</div>
+            <code class="resultat-url">${urlData.publicUrl}</code>
+            <button class="btn-copier" type="button">Copier l'URL</button>
+          </div>`;
+        bloc.querySelector('.btn-copier').addEventListener('click', () => {
+          navigator.clipboard.writeText(urlData.publicUrl);
+          bloc.querySelector('.btn-copier').textContent = 'Copié !';
+        });
+        resultats.prepend(bloc);
+      }
+      input.value = '';
+    });
+  }
+
+  init();
+</script>
+
+</body>
+</html>
