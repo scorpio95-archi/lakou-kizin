@@ -24,7 +24,8 @@ async function init(){
 
   const p = SESSION.profile;
   document.getElementById('fullName').value = p?.full_name || '';
-  document.getElementById('role').value = p?.role || 'etudiant';
+  const ROLE_LABELS = { etudiant: 'Étudiant', enseignant: 'Enseignant', visiteur: 'Visiteur', admin: 'Admin' };
+  document.getElementById('roleAffichage').textContent = ROLE_LABELS[p?.role] || p?.role || '—';
   document.getElementById('atelierPrincipal').value = p?.atelier_principal || '';
   document.getElementById('bio').value = p?.bio || '';
   renderAvatar(p?.avatar_url, p?.full_name);
@@ -68,7 +69,6 @@ async function init(){
     const supabase = await window.lakouKizinReady;
     const { error } = await supabase.from('profiles').update({
       full_name: document.getElementById('fullName').value.trim(),
-      role: document.getElementById('role').value,
       atelier_principal: document.getElementById('atelierPrincipal').value.trim(),
       bio: document.getElementById('bio').value.trim()
     }).eq('id', SESSION.user.id);
