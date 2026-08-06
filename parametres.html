@@ -98,13 +98,9 @@
         <input type="text" id="fullName" required maxlength="80">
       </div>
       <div class="champ">
-        <label for="role">Rôle</label>
-        <select id="role">
-          <option value="etudiant">Étudiant</option>
-          <option value="enseignant">Enseignant</option>
-          <option value="visiteur">Visiteur</option>
-          <option value="admin" disabled>Admin</option>
-        </select>
+        <label>Rôle</label>
+        <div id="roleAffichage" style="padding:12px 14px;border-radius:10px;background:rgba(42,23,19,0.06);color:var(--charbon);font-size:0.95rem;">—</div>
+        <p style="font-size:0.78rem;color:#6b5d4e;margin-top:6px;">Le rôle est attribué par un·e administrateur·rice — tu ne peux pas le modifier toi-même.</p>
       </div>
       <div class="champ">
         <label for="atelierPrincipal">Atelier principal</label>
