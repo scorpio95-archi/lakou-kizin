@@ -1,140 +1,61 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lakou Kizin — Les métiers de la cuisine</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
+// ============================================================
+// LAKOU KIZIN — annuaire.html
+// Liste parcourable de la communauté (étudiant·e·s/enseignant·e·s),
+// chaque carte mène vers la galerie publique de la personne.
+// Les comptes "visiteur" (pas encore membres validés) n'apparaissent
+// pas ici — l'annuaire représente la communauté active.
+// ============================================================
 
-<header>
-  <a href="index.html" class="logo-link">
-    <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
-      <circle cx="20" cy="20" r="18" fill="#c1481d"/>
-      <path d="M13 15v10M13 15c0 2 2 2 2 0v-3M17 15v10M17 12c-2 0-3 1.5-3 4M27 12c-4 0-6 3-6 7 0 2 1.5 3 3 3s3-1 3-3" stroke="#fbf3e7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    <span class="logo-text">LAKOU<span>Kizin</span></span>
-  </a>
-  <button class="burger" id="burgerBtn" aria-label="Menu">
-    <span></span><span></span><span></span>
-  </button>
-</header>
+const ROLE_LABELS = { etudiant: 'Étudiant', enseignant: 'Enseignant', admin: 'Administration' };
+let annuaireData = [];
+let filtreActuel = '';
 
-<div class="fil-ariane" style="justify-content:space-between;">
-  <span style="display:flex; align-items:center; gap:6px;">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
-    <a href="https://lakou-inivesite.vercel.app/">Lakou Inivesite</a>
-    <span style="opacity:.6;">/</span>
-    <span>Lakou Kizin</span>
-  </span>
-  <span id="authStatus" style="font-weight:700;"></span>
-</div>
-
-<div class="overlay" id="overlay"></div>
-<nav class="menu-panel" id="menuPanel">
-  <div class="menu-section">Navigation</div>
-  <a href="index.html" data-close>Accueil<small>Retour en haut de page</small></a>
-
-  <button class="menu-accordion-toggle" id="ateliersToggle">
-    <span>Ateliers<small>Pâtisserie, boulangerie, cuisine locale…</small></span>
-    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-  </button>
-  <div class="menu-submenu" id="ateliersSubmenu">
-    <a href="atelier.html?slug=patisserie" data-close>Pâtisserie</a>
-    <a href="atelier.html?slug=boulangerie" data-close>Boulangerie</a>
-    <a href="atelier.html?slug=cuisine-locale" data-close>Cuisine locale</a>
-    <a href="atelier.html?slug=art-de-la-table" data-close>Art de la table</a>
-  </div>
-
-  <a href="#creations" data-close>Vos créations<small>Les petits succès des étudiants</small></a>
-  <a href="parametres.html" id="menuParametres" data-close style="display:none;">Mon profil<small>Avatar, informations, mot de passe</small></a>
-
-  <div class="menu-section">Réseau</div>
-  <a href="https://lakou-inivesite.vercel.app/">← Retour à Lakou Inivesite</a>
-  <a href="#" id="menuDeconnexion" style="display:none; color:var(--bordeaux);">Se déconnecter</a>
-</nav>
-
-<main id="top">
-
-  <section class="banniere">
-    <img src="https://xhjmmvpicywuyinzizal.supabase.co/storage/v1/object/public/lakou-kizin-media/site/1785201764777-d0ddb13cf88358216b924fec0d7726f7.jpg" alt="" id="banniereImg" onerror="this.style.display='none';">
-    <div class="banniere-scrim"></div>
-    <div class="banniere-content">
-      <span class="kicker">École professionnelle</span>
-      <h1>LAKOU KIZIN</h1>
-      <p>Les métiers de la cuisine et de la table — le portfolio des étudiants et enseignants haïtiens, geste par geste.</p>
+function annuaireCardHTML(p) {
+  const initiale = (p.full_name || '?').charAt(0).toUpperCase();
+  const avatarHtml = p.avatar_url ? `<img src="${p.avatar_url}" alt="">` : initiale;
+  return `
+  <a class="annuaire-card" href="galerie.html?id=${p.id}">
+    <div class="annuaire-avatar">${avatarHtml}</div>
+    <div class="annuaire-body">
+      <div class="annuaire-role">${ROLE_LABELS[p.role] || p.role}</div>
+      <div class="annuaire-nom">${p.full_name}</div>
+      ${p.atelier_principal ? `<div class="annuaire-atelier">${p.atelier_principal}</div>` : ''}
     </div>
-  </section>
+  </a>`;
+}
 
-  <div class="section-label" id="ateliers"><span>Les ateliers</span><div class="line"></div></div>
-  <p class="section-intro">Chaque atelier est une galerie vivante : projets, techniques et progrès des étudiants.</p>
+function filtrerAnnuaire(role, btn) {
+  filtreActuel = role;
+  document.querySelectorAll('.annuaire-tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  rendreAnnuaire();
+}
 
-  <section class="ateliers-grid" id="ateliersGrid">
-    <!-- injecté par app-kizin.js -->
-  </section>
-
-  <div class="creations-bandeau" id="creations">
-    <div class="section-label"><span>Vos créations</span><div class="line"></div></div>
-    <p class="section-intro">Les petits succès partagés par la communauté — likez, commentez, encouragez.</p>
-
-    <div class="creations-scroll" id="creationsScroll">
-      <!-- injecté par app.js -->
-    </div>
-  </div>
-
-  <div class="admin-public-section" id="adminPublicSection" style="display:none;">
-    <div class="section-label"><span>L'équipe</span><div class="line"></div></div>
-    <div class="admin-public-card" id="adminPublicCard"></div>
-  </div>
-
-  <footer>
-    <p>Lakou Kizin fait partie du réseau Lakou Inivesite.</p>
-    <p style="margin-top:6px;">© 2026 Lakou Inivesite</p>
-  </footer>
-
-</main>
-
-<script src="client-supabase.js"></script>
-<script src="auth.js"></script>
-<script src="app.js"></script>
-<script>
-  const burgerBtn = document.getElementById('burgerBtn');
-  const menuPanel = document.getElementById('menuPanel');
-  const overlay = document.getElementById('overlay');
-  function closeMenu(){
-    burgerBtn.classList.remove('open');
-    menuPanel.classList.remove('open');
-    overlay.classList.remove('open');
+function rendreAnnuaire() {
+  const grille = document.getElementById('annuaireGrille');
+  const liste = filtreActuel ? annuaireData.filter(p => p.role === filtreActuel) : annuaireData;
+  if (liste.length === 0) {
+    grille.innerHTML = `<p class="pub-grid-empty">Personne à afficher pour cette catégorie.</p>`;
+    return;
   }
-  burgerBtn.addEventListener('click', () => {
-    const isOpen = menuPanel.classList.toggle('open');
-    burgerBtn.classList.toggle('open', isOpen);
-    overlay.classList.toggle('open', isOpen);
-  });
-  overlay.addEventListener('click', closeMenu);
-  menuPanel.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', closeMenu));
+  grille.innerHTML = liste.map(annuaireCardHTML).join('');
+}
 
-  const ateliersToggle = document.getElementById('ateliersToggle');
-  const ateliersSubmenu = document.getElementById('ateliersSubmenu');
-  ateliersToggle.addEventListener('click', () => {
-    ateliersToggle.classList.toggle('open');
-    ateliersSubmenu.classList.toggle('open');
-  });
+async function chargerAnnuaire() {
+  const supabase = await window.lakouKizinReady;
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, full_name, role, atelier_principal, avatar_url')
+    .in('role', ['etudiant', 'enseignant', 'admin'])
+    .order('full_name', { ascending: true });
 
-  (async () => {
-    const session = await sessionActuelle();
-    const lienDeco = document.getElementById('menuDeconnexion');
-    const lienParams = document.getElementById('menuParametres');
-    if (session) {
-      lienDeco.style.display = 'block';
-      lienParams.style.display = 'block';
-      lienDeco.addEventListener('click', (e) => { e.preventDefault(); deconnecter(); });
-    }
-  })();
-</script>
+  const grille = document.getElementById('annuaireGrille');
+  if (error) {
+    grille.innerHTML = `<p class="pub-grid-empty">Erreur de chargement.</p>`;
+    return;
+  }
+  annuaireData = data || [];
+  rendreAnnuaire();
+}
 
-</body>
-</html>
+chargerAnnuaire();
