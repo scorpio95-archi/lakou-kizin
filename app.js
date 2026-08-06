@@ -86,5 +86,39 @@ async function chargerCreations(){
   wrap.innerHTML = data.map(creationCardHTML).join('');
 }
 
+async function chargerAdminPublic(){
+  const section = document.getElementById('adminPublicSection');
+  const card = document.getElementById('adminPublicCard');
+  if (!section || !card) return;
+
+  const supabase = await window.lakouKizinReady;
+  // Toujours à jour : lit directement le profil, reflète donc immédiatement
+  // ce que l'admin modifie dans Paramètres (nom, atelier, bio, avatar).
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('full_name, avatar_url, atelier_principal, bio')
+    .eq('role', 'admin')
+    .limit(1)
+    .maybeSingle();
+
+  if (error || !data) return;
+
+  const initiale = (data.full_name || '?').charAt(0).toUpperCase();
+  const avatarHtml = data.avatar_url
+    ? `<img src="${data.avatar_url}" alt="">`
+    : initiale;
+
+  card.innerHTML = `
+    <div class="apc-avatar">${avatarHtml}</div>
+    <div class="apc-body">
+      <div class="apc-role">Administration</div>
+      <div class="apc-nom">${data.full_name || 'Lakou Kizin'}</div>
+      ${data.atelier_principal ? `<div class="apc-atelier">${data.atelier_principal}</div>` : ''}
+      ${data.bio ? `<div class="apc-bio">${data.bio}</div>` : ''}
+    </div>`;
+  section.style.display = 'block';
+}
+
 chargerAteliers();
 chargerCreations();
+chargerAdminPublic();
