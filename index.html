@@ -1,231 +1,141 @@
-// ============================================================
-// LAKOU KIZIN — dashboard.html
-// Réplique du modèle Achitekti : ateliers avec compteurs temps
-// réel, mes publications, Statistiques (admin), Modération
-// (admin — supprime toute publication contraire aux règles),
-// Utilisateurs (admin + enseignant, rôle éditable admin only).
-// ============================================================
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lakou Kizin — Les métiers de la cuisine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-var SESSION = null;
-var ROLE_LABELS_DASH = { etudiant: 'étudiant·e', enseignant: 'enseignant·e', admin: 'administrateur·rice', visiteur: 'visiteur·se' };
+<header>
+  <a href="index.html" class="logo-link">
+    <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+      <circle cx="20" cy="20" r="18" fill="#c1481d"/>
+      <path d="M13 15v10M13 15c0 2 2 2 2 0v-3M17 15v10M17 12c-2 0-3 1.5-3 4M27 12c-4 0-6 3-6 7 0 2 1.5 3 3 3s3-1 3-3" stroke="#fbf3e7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="logo-text">LAKOU<span>Kizin</span></span>
+  </a>
+  <button class="burger" id="burgerBtn" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</header>
 
-(async function initDashboard() {
-  SESSION = await sessionActuelle();
-  if (!SESSION) { window.location.href = 'connexion.html'; return; }
+<div class="fil-ariane" style="justify-content:space-between;">
+  <span style="display:flex; align-items:center; gap:6px;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+    <a href="https://lakou-inivesite.vercel.app/">Lakou Inivesite</a>
+    <span style="opacity:.6;">/</span>
+    <span>Lakou Kizin</span>
+  </span>
+  <span id="authStatus" style="font-weight:700;"></span>
+</div>
 
-  document.getElementById('dash-loading').style.display = 'none';
-  document.getElementById('dash-content').style.display = 'block';
+<div class="overlay" id="overlay"></div>
+<nav class="menu-panel" id="menuPanel">
+  <div class="menu-section">Navigation</div>
+  <a href="index.html" data-close>Accueil<small>Retour en haut de page</small></a>
 
-  var nom = SESSION.profile?.full_name || SESSION.user.email;
-  var role = SESSION.profile?.role || 'etudiant';
+  <button class="menu-accordion-toggle" id="ateliersToggle">
+    <span>Ateliers<small>Pâtisserie, boulangerie, cuisine locale…</small></span>
+    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
+  <div class="menu-submenu" id="ateliersSubmenu">
+    <a href="atelier.html?slug=patisserie" data-close>Pâtisserie</a>
+    <a href="atelier.html?slug=boulangerie" data-close>Boulangerie</a>
+    <a href="atelier.html?slug=cuisine-locale" data-close>Cuisine locale</a>
+    <a href="atelier.html?slug=art-de-la-table" data-close>Art de la table</a>
+  </div>
 
-  document.getElementById('dash-title-bienvenue').textContent = 'Bonjour, ' + nom;
-  document.getElementById('dash-sub-role').textContent = 'Connecté·e en tant que ' + (ROLE_LABELS_DASH[role] || role) + ' — Lakou Kizin';
+  <a href="#creations" data-close>Vos créations<small>Les petits succès des étudiants</small></a>
+  <a href="dashboard.html" id="menuParametres" data-close style="display:none;">Tableau de bord<small>Ateliers, publications, paramètres</small></a>
 
-  if (role === 'visiteur') return; // pas d'ateliers/publications pour un visiteur
+  <div class="menu-section">Réseau</div>
+  <a href="annuaire.html" data-close>Annuaire<small>Étudiant·e·s et enseignant·e·s de Lakou Kizin</small></a>
+  <a href="https://lakou-inivesite.vercel.app/">← Retour à Lakou Inivesite</a>
+  <a href="#" id="menuDeconnexion" style="display:none; color:var(--bordeaux);">Se déconnecter</a>
+</nav>
 
-  document.getElementById('dash-ateliers').style.display = 'block';
-  document.getElementById('dash-publications').style.display = 'block';
-  chargerDashAteliers();
-  chargerDashPublications();
+<main id="top">
 
-  if (role === 'admin') {
-    document.getElementById('dash-stats').style.display = 'block';
-    document.getElementById('dash-moderation').style.display = 'block';
-    chargerDashStats();
-    chargerDashModeration();
+  <section class="banniere">
+    <img src="https://xhjmmvpicywuyinzizal.supabase.co/storage/v1/object/public/lakou-kizin-media/site/1785201764777-d0ddb13cf88358216b924fec0d7726f7.jpg" alt="" id="banniereImg" onerror="this.style.display='none';">
+    <div class="banniere-scrim"></div>
+    <div class="banniere-content">
+      <span class="kicker">École professionnelle</span>
+      <h1>LAKOU KIZIN</h1>
+      <p>Les métiers de la cuisine et de la table — le portfolio des étudiants et enseignants haïtiens, geste par geste.</p>
+    </div>
+  </section>
+
+  <div class="section-label" id="ateliers"><span>Les ateliers</span><div class="line"></div></div>
+  <p class="section-intro">Chaque atelier est une galerie vivante : projets, techniques et progrès des étudiants.</p>
+
+  <section class="ateliers-grid" id="ateliersGrid">
+    <!-- injecté par app-kizin.js -->
+  </section>
+
+  <div class="creations-bandeau" id="creations">
+    <div class="section-label"><span>Vos créations</span><div class="line"></div></div>
+    <p class="section-intro">Les petits succès partagés par la communauté — likez, commentez, encouragez.</p>
+
+    <div class="creations-scroll" id="creationsScroll">
+      <!-- injecté par app.js -->
+    </div>
+  </div>
+
+  <div class="admin-public-section" id="adminPublicSection" style="display:none;">
+    <div class="section-label"><span>L'équipe</span><div class="line"></div></div>
+    <div class="admin-public-card" id="adminPublicCard"></div>
+  </div>
+
+  <footer>
+    <p>Lakou Kizin fait partie du réseau Lakou Inivesite.</p>
+    <p style="margin-top:6px;">© 2026 Lakou Inivesite</p>
+  </footer>
+
+</main>
+
+<script src="client-supabase.js"></script>
+<script src="auth.js"></script>
+<script src="app.js"></script>
+<script>
+  const burgerBtn = document.getElementById('burgerBtn');
+  const menuPanel = document.getElementById('menuPanel');
+  const overlay = document.getElementById('overlay');
+  function closeMenu(){
+    burgerBtn.classList.remove('open');
+    menuPanel.classList.remove('open');
+    overlay.classList.remove('open');
   }
-  if (role === 'admin' || role === 'enseignant') {
-    document.getElementById('dash-users').style.display = 'block';
-    chargerDashUsers();
-  }
-})();
-
-/* ------------------------------------------------------------
-   Mes ateliers — compteurs en temps réel, un par atelier
------------------------------------------------------------- */
-async function chargerDashAteliers() {
-  const supabase = await window.lakouKizinReady;
-  const grid = document.getElementById('dash-ateliers-grid');
-
-  const { data: ateliers } = await supabase.from('ateliers').select('id, slug, nom').order('ordre', { ascending: true });
-  if (!ateliers || ateliers.length === 0) { grid.innerHTML = '<p class="pub-grid-empty">Aucun atelier configuré.</p>'; return; }
-
-  let html = '';
-  for (const a of ateliers) {
-    const { count } = await supabase.from('publications').select('*', { count: 'exact', head: true })
-      .eq('user_id', SESSION.user.id).eq('atelier_id', a.id);
-    html += `<a class="dash-atelier-mini" href="atelier.html?slug=${a.slug}">
-      <span class="dash-atelier-mini-num">${count || 0}</span>
-      <span class="dash-atelier-mini-label">${a.nom}</span>
-    </a>`;
-  }
-  grid.innerHTML = html;
-
-  // Mise à jour en direct si une publication est ajoutée/supprimée pendant que le dashboard est ouvert
-  supabase.channel('dash-publications-' + SESSION.user.id)
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'publications', filter: 'user_id=eq.' + SESSION.user.id },
-      () => chargerDashAteliers())
-    .subscribe();
-}
-
-/* ------------------------------------------------------------
-   Mes publications
------------------------------------------------------------- */
-async function chargerDashPublications() {
-  const supabase = await window.lakouKizinReady;
-  const list = document.getElementById('dash-publications-list');
-  const { data } = await supabase.from('publications')
-    .select('id, titre, created_at, ateliers(nom)')
-    .eq('user_id', SESSION.user.id)
-    .order('created_at', { ascending: false });
-
-  if (!data || data.length === 0) {
-    list.innerHTML = '<p class="pub-grid-empty">Aucune publication pour le moment.</p>';
-    return;
-  }
-  list.innerHTML = data.map(p => `
-    <div class="dash-row" onclick="window.location.href='publication.html?id=${p.id}'">
-      <span class="dash-row-titre">${p.titre}</span>
-      <span class="dash-row-meta">${p.ateliers?.nom || ''}</span>
-    </div>`).join('');
-}
-
-/* ------------------------------------------------------------
-   Statistiques — admin uniquement
------------------------------------------------------------- */
-async function chargerDashStats() {
-  const supabase = await window.lakouKizinReady;
-
-  const { count: inscrits } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
-  document.getElementById('dash-stats-inscrits').textContent = inscrits ?? 0;
-
-  supabase.channel('dash-profiles-count')
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'profiles' }, () => {
-      const el = document.getElementById('dash-stats-inscrits');
-      el.textContent = (parseInt(el.textContent, 10) || 0) + 1;
-    })
-    .subscribe();
-
-  const { data: ateliers } = await supabase.from('ateliers').select('id, nom').order('ordre', { ascending: true });
-  const { data: pubs } = await supabase.from('publications').select('atelier_id');
-
-  document.getElementById('dash-stats-publications').textContent = (pubs || []).length;
-
-  const counts = {};
-  (ateliers || []).forEach(a => counts[a.id] = 0);
-  (pubs || []).forEach(p => { if (counts[p.atelier_id] !== undefined) counts[p.atelier_id]++; });
-
-  new Chart(document.getElementById('dash-stats-chart'), {
-    type: 'bar',
-    data: {
-      labels: (ateliers || []).map(a => a.nom),
-      datasets: [{ data: (ateliers || []).map(a => counts[a.id]), backgroundColor: '#c1481d', borderRadius: 4 }]
-    },
-    options: {
-      plugins: { legend: { display: false } },
-      scales: { y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 10 } } }, x: { ticks: { font: { size: 9 } } } }
-    }
+  burgerBtn.addEventListener('click', () => {
+    const isOpen = menuPanel.classList.toggle('open');
+    burgerBtn.classList.toggle('open', isOpen);
+    overlay.classList.toggle('open', isOpen);
   });
-}
+  overlay.addEventListener('click', closeMenu);
+  menuPanel.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', closeMenu));
 
-document.addEventListener('DOMContentLoaded', () => {
-  const btn = document.getElementById('dash-btn-rapport');
-  if (!btn) return;
-  btn.addEventListener('click', async () => {
-    const supabase = await window.lakouKizinReady;
-    const msg = document.getElementById('dash-rapport-msg');
-    btn.disabled = true; btn.textContent = 'Envoi…';
-    msg.textContent = '';
-    const res = await supabase.functions.invoke('send-dashboard-report');
-    btn.disabled = false; btn.textContent = 'Envoyer un rapport';
-    if (res.error) {
-      let detail = res.error.message || 'Erreur inconnue.';
-      if (res.error.context && typeof res.error.context.json === 'function') {
-        try { const body = await res.error.context.json(); if (body?.error) detail = body.error; } catch (e) {}
-      }
-      msg.textContent = "Échec de l'envoi : " + detail;
-      msg.style.color = '#991b1b';
-      return;
-    }
-    msg.textContent = 'Rapport envoyé par email.';
-    msg.style.color = '#166534';
+  const ateliersToggle = document.getElementById('ateliersToggle');
+  const ateliersSubmenu = document.getElementById('ateliersSubmenu');
+  ateliersToggle.addEventListener('click', () => {
+    ateliersToggle.classList.toggle('open');
+    ateliersSubmenu.classList.toggle('open');
   });
-});
 
-/* ------------------------------------------------------------
-   Modération — admin uniquement, supprime toute publication
------------------------------------------------------------- */
-async function chargerDashModeration() {
-  const supabase = await window.lakouKizinReady;
-  const list = document.getElementById('dash-moderation-list');
-  const { data } = await supabase.from('publications')
-    .select('id, titre, created_at, profiles(full_name), ateliers(nom)')
-    .order('created_at', { ascending: false })
-    .limit(30);
-
-  if (!data || data.length === 0) { list.innerHTML = '<p class="pub-grid-empty">Aucune publication.</p>'; return; }
-
-  list.innerHTML = data.map(p => `
-    <div class="dash-row" id="mod-${p.id}">
-      <div>
-        <span class="dash-row-titre">${p.titre}</span>
-        <span class="dash-row-meta">${p.profiles?.full_name || '—'} · ${p.ateliers?.nom || ''}</span>
-      </div>
-      <button class="dash-btn-supprimer" onclick="supprimerPublicationModeration('${p.id}')">Supprimer</button>
-    </div>`).join('');
-}
-
-async function supprimerPublicationModeration(id) {
-  if (!confirm('Supprimer définitivement cette publication ?')) return;
-  const supabase = await window.lakouKizinReady;
-  const { error } = await supabase.from('publications').delete().eq('id', id);
-  if (error) { alert("Échec de la suppression : " + error.message); return; }
-  const row = document.getElementById('mod-' + id);
-  if (row) row.remove();
-}
-
-/* ------------------------------------------------------------
-   Utilisateurs — admin + enseignant (rôle éditable admin only)
------------------------------------------------------------- */
-async function chargerDashUsers() {
-  const supabase = await window.lakouKizinReady;
-  const list = document.getElementById('dash-users-list');
-  const { data: users } = await supabase.from('profiles').select('id, full_name, role, created_at').order('created_at', { ascending: false });
-
-  if (!users || users.length === 0) { list.innerHTML = '<p class="pub-grid-empty">Aucun inscrit.</p>'; return; }
-
-  const canEditRoles = SESSION.profile?.role === 'admin';
-
-  list.innerHTML = users.map(u => {
-    if (canEditRoles) {
-      return `<div class="dash-row">
-        <span class="dash-row-titre">${u.full_name || 'Sans nom'}</span>
-        <select class="dash-role-select" data-id="${u.id}">
-          <option value="etudiant" ${u.role === 'etudiant' ? 'selected' : ''}>etudiant</option>
-          <option value="enseignant" ${u.role === 'enseignant' ? 'selected' : ''}>enseignant</option>
-          <option value="visiteur" ${u.role === 'visiteur' ? 'selected' : ''}>visiteur</option>
-          <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>admin</option>
-        </select>
-        <span class="dash-role-status" data-statut></span>
-      </div>`;
+  (async () => {
+    const session = await sessionActuelle();
+    const lienDeco = document.getElementById('menuDeconnexion');
+    const lienParams = document.getElementById('menuParametres');
+    if (session) {
+      lienDeco.style.display = 'block';
+      lienParams.style.display = 'block';
+      lienDeco.addEventListener('click', (e) => { e.preventDefault(); deconnecter(); });
     }
-    return `<div class="dash-row">
-      <span class="dash-row-titre">${u.full_name || 'Sans nom'}</span>
-      <span class="dash-row-meta" style="font-style:italic;">${u.role}</span>
-    </div>`;
-  }).join('');
+  })();
+</script>
 
-  if (!canEditRoles) return;
-
-  document.querySelectorAll('.dash-role-select').forEach(select => {
-    select.addEventListener('change', async () => {
-      const id = select.getAttribute('data-id');
-      const statusEl = select.parentElement.querySelector('[data-statut]');
-      statusEl.textContent = '…';
-      const { error } = await supabase.from('profiles').update({ role: select.value }).eq('id', id);
-      statusEl.textContent = error ? '✕' : '✓';
-      statusEl.style.color = error ? '#991b1b' : '#166534';
-    });
-  });
-}
+</body>
+</html>
