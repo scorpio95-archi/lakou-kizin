@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calendrier — Lakou Kizin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo-link">
+    <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+      <circle cx="20" cy="20" r="18" fill="#c1481d"/>
+      <path d="M13 15v10M13 15c0 2 2 2 2 0v-3M17 15v10M17 12c-2 0-3 1.5-3 4M27 12c-4 0-6 3-6 7 0 2 1.5 3 3 3s3-1 3-3" stroke="#fbf3e7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="logo-text">LAKOU<span>Kizin</span></span>
+  </a>
+  <span id="authStatus" style="font-weight:700; font-size:0.9rem;"></span>
+</header>
+
+<div class="fil-ariane">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+  <a href="index.html">Lakou Kizin</a>
+  <span style="opacity:.6;">/</span>
+  <span>Calendrier</span>
+</div>
+
+<div class="cal-intro">
+  <h1>Calendrier</h1>
+  <p>Dégustations, concours, portes ouvertes — les rendez-vous de Lakou Kizin.</p>
+</div>
+
+<div id="cal-admin-bar" class="hidden cal-admin-bar">
+  <button class="btn-principal" onclick="ouvrirNouvelEvenement()">+ Nouvel événement</button>
+</div>
+
+<div class="cal-tabs">
+  <button class="cal-tab active" data-mode="a-venir" onclick="setCalMode('a-venir', this)">À venir</button>
+  <button class="cal-tab" data-mode="passes" onclick="setCalMode('passes', this)">Passés</button>
+</div>
+
+<div id="cal-list" class="cal-list">
+  <p class="pub-grid-empty">Chargement…</p>
+</div>
+
+<footer>Lakou Kizin — École de cuisine, réseau Lakou Inivesite</footer>
+
+<!-- Modal création/édition événement (admin + enseignant) -->
+<div class="cal-modal-overlay" id="cal-modal-overlay">
+  <div class="cal-modal-card">
+    <button class="cal-modal-close" id="cal-modal-close" type="button">&times;</button>
+    <h2 id="cal-modal-title">Nouvel événement</h2>
+
+    <div class="champ">
+      <label>Titre</label>
+      <input type="text" id="ev-titre" placeholder="Ex. Dégustation de fin d'atelier">
+    </div>
+
+    <div class="champ">
+      <label>Type</label>
+      <select id="ev-type">
+        <option value="degustation">Dégustation</option>
+        <option value="concours">Concours</option>
+        <option value="portes-ouvertes">Portes ouvertes</option>
+        <option value="autre">Autre</option>
+      </select>
+    </div>
+
+    <div class="champ">
+      <label>Date et heure de début</label>
+      <input type="datetime-local" id="ev-debut">
+    </div>
+
+    <div class="champ">
+      <label>Date et heure de fin (optionnel)</label>
+      <input type="datetime-local" id="ev-fin">
+    </div>
+
+    <div class="champ">
+      <label>Lieu</label>
+      <input type="text" id="ev-lieu" placeholder="Ex. Campus Lakou Kizin, Les Cayes">
+    </div>
+
+    <div class="champ">
+      <label>Description</label>
+      <textarea id="ev-description" rows="4" placeholder="Détails pratiques, ce à quoi s'attendre..."></textarea>
+    </div>
+
+    <div class="cal-modal-actions">
+      <button class="btn-secondaire" id="ev-delete-btn" onclick="supprimerEvenement()" style="display:none;">Supprimer</button>
+      <button class="btn-principal" id="ev-save-btn" onclick="enregistrerEvenement()">Enregistrer</button>
+    </div>
+    <p id="cal-modal-msg" class="cal-modal-msg"></p>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="client-supabase.js"></script>
+<script src="auth.js"></script>
+<script src="calendrier.js"></script>
+</body>
+</html>
