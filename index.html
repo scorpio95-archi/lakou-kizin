@@ -52,10 +52,14 @@
   <a href="#creations" data-close>Vos créations<small>Les petits succès des étudiants</small></a>
   <a href="revue.html" data-close>Revue<small>Recettes, portraits et coulisses</small></a>
   <a href="calendrier.html" data-close>Calendrier<small>Dégustations, concours, portes ouvertes</small></a>
+  <a href="forum.html" id="menuForum" data-close style="display:none;">Forum<small>Questions, entraide, annonces</small></a>
   <a href="dashboard.html" id="menuParametres" data-close style="display:none;">Tableau de bord<small>Ateliers, publications, paramètres</small></a>
 
   <div class="menu-section">Réseau</div>
   <a href="annuaire.html" data-close>Annuaire<small>Étudiant·e·s et enseignant·e·s de Lakou Kizin</small></a>
+  <a href="contact.html" data-close>Contactez-nous<small>Questions, problèmes techniques, partenariats</small></a>
+  <a href="apropos.html" data-close>À propos</a>
+  <a href="confidentialite.html" data-close>Confidentialité</a>
   <a href="https://lakou-inivesite.vercel.app/">← Retour à Lakou Inivesite</a>
   <a href="#" id="menuDeconnexion" style="display:none; color:var(--bordeaux);">Se déconnecter</a>
 </nav>
@@ -147,10 +151,14 @@
     const session = await sessionActuelle();
     const lienDeco = document.getElementById('menuDeconnexion');
     const lienParams = document.getElementById('menuParametres');
+    const lienForum = document.getElementById('menuForum');
     if (session) {
       lienDeco.style.display = 'block';
       lienParams.style.display = 'block';
       lienDeco.addEventListener('click', (e) => { e.preventDefault(); deconnecter(); });
+      if (session.profile?.role && session.profile.role !== 'visiteur') {
+        lienForum.style.display = 'block';
+      }
     }
   })();
 </script>
